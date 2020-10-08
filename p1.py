@@ -17,7 +17,37 @@ def dijkstras_shortest_path(initial_position, destination, graph, adj):
         Otherwise, return None.
 
     """
-    pass
+    frontQueue = []
+    heappush(frontQueue, (0, initial_position))
+    came_from = dict()
+    cost_so_far = dict()
+    came_from[initial_position] = None
+    cost_so_far = 0
+
+    while not frontQueue:
+        p1, currentTile = heappop(frontQueue)
+
+        if (currentTile == destination):
+            #starting from the destination, we back track through came_from until there are no more cells left to back track to
+            pathCells = []
+            while (came_from[currentTile] is not None):
+                pathCells.append(currentTile)
+                currentTile = came_from[currentTile]
+            return pathCells
+
+        #should iterate through all neighbors of currentTile. neighbor[1] should be cost to travel
+        for neighbor in adj(currentTile):
+            new_cost = cost_so_far[currentTile] + neighbors[1]
+            if (neighbor not in cost_so_far or new_cost < cost_so_far[neighbor]):
+                cost_so_far[neighbor] = new_cost
+                priority = new_cost
+                heappush(frontQueue, (priority, neighbor))
+                came_from[neighbor] = currentTile
+
+    #in the case that it exits but no path is found
+    return None
+
+
 
 
 def dijkstras_shortest_path_to_all(initial_position, graph, adj):
@@ -81,7 +111,7 @@ def test_route(filename, src_waypoint, dst_waypoint):
 
 
 def cost_to_all_cells(filename, src_waypoint, output_filename):
-    """ Loads a level, calculates the cost to all reachable cells from 
+    """ Loads a level, calculates the cost to all reachable cells from
     src_waypoint, then saves the result in a csv file with name output_filename.
 
     Args:
@@ -90,14 +120,14 @@ def cost_to_all_cells(filename, src_waypoint, output_filename):
         output_filename: The filename for the output csv file.
 
     """
-    
+
     # Load and display the level.
     level = load_level(filename)
     show_level(level)
 
     # Retrieve the source coordinates from the level.
     src = level['waypoints'][src_waypoint]
-    
+
     # Calculate the cost to all reachable cells from src and save to a csv file.
     costs_to_all_cells = dijkstras_shortest_path_to_all(src, level, navigation_edges)
     save_level_costs(level, costs_to_all_cells, output_filename)
