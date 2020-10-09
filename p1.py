@@ -81,6 +81,20 @@ def navigation_edges(level, cell):
              ((1,1), 1.4142135623730951),
              ... ]
     """
+    steps = [-1, 0, 1]
+    adjList = []
+    for i in steps:
+        for j in steps:
+            tempCell = (cell[0] + i, cell[1] + j)
+            dist = 0.5 if i != j else 0.5 * sqrt(2)
+            if tempCell != cell:
+                if tempCell in level['spaces']:
+                    adj = (tempCell, (level['spaces'][cell] + level['spaces'][tempCell]) * dist)
+                    adjList.append(adj)
+
+    # print(adjList)
+    return adjList
+
     pass
 
 
@@ -124,6 +138,7 @@ def cost_to_all_cells(filename, src_waypoint, output_filename):
     # Load and display the level.
     level = load_level(filename)
     show_level(level)
+    # navigation_edges(level, (2, 10))
 
     # Retrieve the source coordinates from the level.
     src = level['waypoints'][src_waypoint]
