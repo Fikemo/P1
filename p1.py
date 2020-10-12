@@ -17,6 +17,7 @@ def dijkstras_shortest_path(initial_position, destination, graph, adj):
         Otherwise, return None.
 
     """
+
     frontQueue = []
     heappush(frontQueue, (0, initial_position))
     came_from = dict()
@@ -24,21 +25,23 @@ def dijkstras_shortest_path(initial_position, destination, graph, adj):
     came_from[initial_position] = None
     cost_so_far[initial_position] = 0
 
-    while (len(frontQueue) > 0):
+    while len(frontQueue) > 0:
         p1, currentTile = heappop(frontQueue)
 
-        if (currentTile == destination):
-            #starting from the destination, we back track through came_from until there are no more cells left to back track to
+        if currentTile == destination:
             pathCells = []
-            while (came_from[currentTile] is not None):
-                pathCells.append(currentTile)
-                currentTile = came_from[currentTile]
+            ct = currentTile
+
+            print(cost_so_far)
+            while ct is not None:
+                pathCells.append(ct)
+                ct = came_from[ct]
+            print(pathCells)
             return pathCells
 
-        #should iterate through all neighbors of currentTile. neighbor[1] should be cost to travel and neighbor[0] is the coordinates
         for neighbor in adj(graph, currentTile):
             new_cost = cost_so_far[currentTile] + neighbor[1]
-            if (neighbor[0] not in cost_so_far or new_cost < cost_so_far[neighbor[0]]): #if a path or better path is found, update the cost and push the neighbor to queue
+            if neighbor[0] not in cost_so_far or new_cost < cost_so_far[neighbor[0]]:
                 cost_so_far[neighbor[0]] = new_cost
                 priority = new_cost
                 heappush(frontQueue, (priority, neighbor[0]))
@@ -70,12 +73,12 @@ def dijkstras_shortest_path_to_all(initial_position, graph, adj):
     cost_so_far = dict()
     came_from[initial_position] = None
     cost_so_far[initial_position] = 0
-    while (len(frontQueue) > 0):
+    while len(frontQueue) > 0:
         p1, currentTile = heappop(frontQueue)
 
         for neighbor in adj(graph, currentTile):
             new_cost = cost_so_far[currentTile] + neighbor[1]
-            if (neighbor[0] not in cost_so_far or new_cost < cost_so_far[neighbor[0]]):
+            if neighbor[0] not in cost_so_far or new_cost < cost_so_far[neighbor[0]]:
                 cost_so_far[neighbor[0]] = new_cost
                 priority = new_cost
                 heappush(frontQueue, (priority, neighbor[0]))
@@ -102,16 +105,19 @@ def navigation_edges(level, cell):
              ((1,1), 1.4142135623730951),
              ... ]
     """
-    steps = [-1, 0, 1]
+    xSteps = [1, 0, -1]
+    ySteps = [1, 0, -1]
     adjList = []
-    for i in steps:
-        for j in steps:
-            tempCell = (cell[0] + i, cell[1] + j)
-            dist = 0.5 if i != j else 0.5 * sqrt(2)
-            if tempCell != cell:
-                if tempCell in level['spaces']:
-                    adj = (tempCell, (level['spaces'][cell] + level['spaces'][tempCell]) * dist)
-                    adjList.append(adj)
+    for xStep in xSteps:
+        for yStep in ySteps:
+            neighbor = (cell[0] + xStep, cell[1] + yStep)
+            distScalar = 0.5 if xStep != yStep else 0.5 * sqrt(2.0)
+            if not (xStep == 0 and yStep == 0) and neighbor in level['spaces']:
+                cellCost = level['spaces'][cell]
+                neighborCost = level['spaces'][neighbor]
+
+                adj = (neighbor, (cellCost + neighborCost) * distScalar)
+                adjList.append(adj)
 
     # print(adjList)
     return adjList
@@ -170,7 +176,7 @@ def cost_to_all_cells(filename, src_waypoint, output_filename):
 
 
 if __name__ == '__main__':
-    filename, src_waypoint, dst_waypoint = 'example.txt', 'a','e'
+    filename, src_waypoint, dst_waypoint = 'example2.txt', 'a', 'e'
 
     # Use this function call to find the route between two waypoints.
     test_route(filename, src_waypoint, dst_waypoint)
