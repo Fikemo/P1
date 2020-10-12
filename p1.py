@@ -31,12 +31,11 @@ def dijkstras_shortest_path(initial_position, destination, graph, adj):
         if currentTile == destination:
             pathCells = []
             ct = currentTile
-
-            print(cost_so_far)
             while ct is not None:
                 pathCells.append(ct)
                 ct = came_from[ct]
-            print(pathCells)
+            print('total cost =', cost_so_far[currentTile])
+            print()
             return pathCells
 
         for neighbor in adj(graph, currentTile):
@@ -111,7 +110,7 @@ def navigation_edges(level, cell):
     for xStep in xSteps:
         for yStep in ySteps:
             neighbor = (cell[0] + xStep, cell[1] + yStep)
-            distScalar = 0.5 if xStep != yStep else 0.5 * sqrt(2.0)
+            distScalar = 0.5 if yStep == 0 or xStep == 0 else 0.5 * sqrt(2)
             if not (xStep == 0 and yStep == 0) and neighbor in level['spaces']:
                 cellCost = level['spaces'][cell]
                 neighborCost = level['spaces'][neighbor]
